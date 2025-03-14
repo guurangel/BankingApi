@@ -12,31 +12,36 @@ import java.util.Optional;
 @RequestMapping("/")
 public class ContaController {
 
-    private final List<Conta> contas = new ArrayList<>(); // Lista em memória
+    private final List<Conta> contas = new ArrayList<>(); // Cria uma lista para armazenar os dados na memória
 
-    // Endpoint inicial "/"
+    // Cria o Endpoint inicial "/", retornando o nome do projeto e os integrantes da equipe.
     @GetMapping
     public String home() {
         return "Projeto: Banking API - Integrantes: Gustavo Rangel, Luis Felippe Morais das Neves\r\n" + //
                         "";
     }
 
-    // Criar conta (POST /contas)
+    //Endpoint para criar as contas e adicionar na memória local, passando antes por uma validação no método conta.validar();
     @PostMapping("/contas")
-    public ResponseEntity<Conta> criarConta(@RequestBody Conta conta) {
-        conta.setId(); // Gera ID automaticamente
-        conta.setDataAbertura(); // Define a data de abertura
-        contas.add(conta);
-        return ResponseEntity.ok(conta);
+    public ResponseEntity<?> criarConta(@RequestBody Conta conta) {
+        try {
+            conta.setId();
+            conta.setDataAbertura();
+            conta.validar();
+            contas.add(conta);
+            return ResponseEntity.ok(conta);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("{\"erro\": \"" + e.getMessage() + "\"}");
+        }
     }
 
-    // Listar todas as contas (GET /contas)
+    // Endpoint para listar todas as contas (GET /contas)
     @GetMapping("/contas")
     public ResponseEntity<List<Conta>> listarContas() {
         return ResponseEntity.ok(contas);
     }
 
-    // Buscar conta por ID (GET /contas/{id})
+    // Endpoint para buscar conta por ID (GET /contas/{id})
     @GetMapping("/contas/{id}")
     public ResponseEntity<Conta> buscarContaPorId(@PathVariable Long id) {
         Optional<Conta> contaEncontrada = contas.stream()
@@ -47,7 +52,7 @@ public class ContaController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Buscar conta por CPF (GET /contas/cpf/{cpf})
+    // Endpoint para buscar conta por CPF (GET /contas/cpf/{cpf})
     @GetMapping("/contas/cpf/{cpf}")
     public ResponseEntity<Conta> buscarContaPorCpf(@PathVariable String cpf) {
         Optional<Conta> contaEncontrada = contas.stream()
