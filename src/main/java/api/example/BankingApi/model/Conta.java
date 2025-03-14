@@ -24,20 +24,36 @@ public class Conta {
         this.tipo = tipo;
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public void setId() {
         this.id = Math.abs(new Random().nextLong());
     }
 
-    public LocalDateTime getDataAbertura() {
-        return dataAbertura;
-    }
-
     public void setDataAbertura() {
         this.dataAbertura = LocalDateTime.now();
+    }
+
+    public void validar(){
+        if (nome == null || nome.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nome do titular é obrigatório.");
+        }
+        if (cpf == null || cpf.trim().isEmpty()) {
+            throw new IllegalArgumentException("CPF do titular é obrigatório.");
+        }
+        if (dataAbertura != null && dataAbertura.isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("A data de abertura não pode ser no futuro.");
+        }
+        if (saldoInicial < 0) {
+            throw new IllegalArgumentException("O saldo inicial não pode ser negativo.");
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+ 
+    public LocalDateTime getDataAbertura() {
+        return dataAbertura;
     }
 
     public Long getNumero() {
