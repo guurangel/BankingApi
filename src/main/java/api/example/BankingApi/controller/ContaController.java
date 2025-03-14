@@ -1,7 +1,7 @@
 package api.example.BankingApi.controller;
 
 import api.example.BankingApi.model.Conta;
-import api.example.BankingApi.model.Deposito;
+import api.example.BankingApi.model.Transacao;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +36,7 @@ public class ContaController {
             return ResponseEntity.badRequest().body("{\"erro\": \"" + e.getMessage() + "\"}");
         }
     }
-
+    
     // Endpoint para listar todas as contas (GET /contas)
     @GetMapping("/contas")
     public ResponseEntity<List<Conta>> listarContas() {
@@ -67,7 +67,7 @@ public class ContaController {
 
     // Endpoint para realizar depósitos em uma conta (POST /contas/{id}/depositar)
     @PostMapping("/contas/{id}/depositar")
-    public ResponseEntity<Conta> realizarDeposito(@PathVariable Long id, @RequestBody Deposito deposito) {
+    public ResponseEntity<Conta> realizarDeposito(@PathVariable Long id, @RequestBody Transacao deposito) {
         double valorDeposito = deposito.getValor(); // Obtém o valor do depósito
 
         if (valorDeposito <= 0) {
@@ -89,6 +89,38 @@ public class ContaController {
 
         return ResponseEntity.ok(conta); // Retorna os dados da conta atualizada
     }
+
+    // Endpoint para realizar saque em uma conta (POST /contas/{id}/saque)
+    @PostMapping("/contas/{id}/saque")
+    public ResponseEntity<Conta> realizarSaque(@PathVariable Long id, @RequestBody Transacao transacao) {
+        double valorSaque = transacao.getValor();
+
+        // Verifica se o valor do saque é válido (positivo)
+        if (valorSaque <= 0) {
+            return ResponseEntity.badRequest().body(null);  // Retorna erro se o valor do saque for inválido
+        }
+
+        // Encontra a conta pelo ID
+        Conta conta = contas.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (conta == null) {
+            return ResponseEntity.status(404).body(null);  // Retorna erro se a conta não for encontrada
+        }
+
+        // Verifica se o saldo é suficiente para o saque
+        if (conta.getSaldo() < valorSaque) {
+            return ResponseEntity.status(400).body(null);
+        }
+
+        double novoSaldo = conta.getSaldo() - valorSaque;
+        conta.setSaldo(novoSaldo);
+
+        return ResponseEntity.ok(conta);
+    }
+
 
     // Endpoint para encerrar uma conta
     @PutMapping("contas/{id}/encerrar")
