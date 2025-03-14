@@ -5,23 +5,20 @@ import java.util.Random;
 
 public class Conta {
     private Long id;
-    private Long numero; // Número da conta
-    private String agencia; // Agência da conta
-    private String nome; // Nome do titular
-    private char cpf; // CPF do titular
-    private LocalDateTime dataAbertura; // Data de abertura da conta
-    private double saldoInicial; // Saldo inicial
-    private char ativa; // Indica se a conta está ativa ('s' ou 'n')
+    private Long numero;
+    private String agencia;
+    private String nome;
+    private String cpf;
+    private LocalDateTime dataAbertura;
+    private double saldoInicial;
+    private char ativa;
     private Tipos tipo;
 
-    public Conta(Long id, Long numero, String agencia, String nome, char cpf, LocalDateTime dataAbertura, double saldoInicial,
-            char ativa, Tipos tipo) {
-        this.id = Math.abs(new Random().nextLong());
+    public Conta(Long numero, String agencia, String nome, String cpf, double saldoInicial, Tipos tipo) {
         this.numero = numero;
         this.agencia = agencia;
         this.nome = nome;
         this.cpf = cpf;
-        this.dataAbertura = LocalDateTime.now();
         this.saldoInicial = saldoInicial;
         this.ativa = 's';
         this.tipo = tipo;
@@ -29,6 +26,18 @@ public class Conta {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId() {
+        this.id = Math.abs(new Random().nextLong());
+    }
+
+    public LocalDateTime getDataAbertura() {
+        return dataAbertura;
+    }
+
+    public void setDataAbertura() {
+        this.dataAbertura = LocalDateTime.now();
     }
 
     public Long getNumero() {
@@ -43,12 +52,8 @@ public class Conta {
         return nome;
     }
 
-    public char getCpf() {
+    public String getCpf() {
         return cpf;
-    }
-
-    public LocalDateTime getDataAbertura() {
-        return dataAbertura;
     }
 
     public double getSaldoInicial() {
