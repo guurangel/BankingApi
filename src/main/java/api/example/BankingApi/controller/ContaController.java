@@ -2,6 +2,7 @@ package api.example.BankingApi.controller;
 
 import api.example.BankingApi.model.Conta;
 import api.example.BankingApi.model.Transacao;
+import api.example.BankingApi.model.TransacaoPix;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +37,7 @@ public class ContaController {
             return ResponseEntity.badRequest().body("{\"erro\": \"" + e.getMessage() + "\"}");
         }
     }
-    
+
     // Endpoint para listar todas as contas (GET /contas)
     @GetMapping("/contas")
     public ResponseEntity<List<Conta>> listarContas() {
@@ -121,6 +122,50 @@ public class ContaController {
         return ResponseEntity.ok(conta);
     }
 
+    // Endpoint para realizar o Pix (POST /contas/pix)
+    @PostMapping("/contas/pix")
+    public ResponseEntity<String> realizarPix(@RequestBody TransacaoPix transacaoPix) {
+        Long contaOrigemId = transacaoPix.getContaOrigemId();
+        Long contaDestinoId = transacaoPix.getContaDestinoId();
+        double valorPix = transacaoPix.getValor();
+
+        // Verifica se o valor do Pix é válido (positivo)
+        if (valorPix <= 0) {
+            return ResponseEntity.badRequest().body("O valor do Pix deve ser positivo.");
+        }
+
+        // Encontra a conta de origem
+        Conta contaOrigem = contas.stream()
+                .filter(c -> c.getId().equals(contaOrigemId))
+                .findFirst()
+                .orElse(null);
+
+        if (contaOrigem == null) {
+            return ResponseEntity.status(404).body("Conta de origem não encontrada.");
+        }
+
+        // Encontra a conta de destino
+        Conta contaDestino = contas.stream()
+                .filter(c -> c.getId().equals(contaDestinoId))
+                .findFirst()
+                .orElse(null);
+
+        if (contaDestino == null) {
+            return ResponseEntity.status(404).body("Conta de destino não encontrada.");
+        }
+
+        // Verifica se o saldo da conta de origem é suficiente
+        if (contaOrigem.getSaldo() < valorPix) {
+            return ResponseEntity.status(400).body("Saldo insuficiente na conta de origem.");
+        }
+
+        // Realiza o Pix: subtrai o valor da conta de origem e adiciona na conta de destino
+        contaOrigem.setSaldo(contaOrigem.getSaldo() - valorPix);
+        contaDestino.setSaldo(contaDestino.getSaldo() + valorPix);
+
+        // Retorna os dados atualizados da conta de origem
+        return ResponseEntity.ok("Pix realizado com sucesso. Saldo da conta de origem atualizado.");
+    }
 
     // Endpoint para encerrar uma conta
     @PutMapping("contas/{id}/encerrar")
