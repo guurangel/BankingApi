@@ -20,7 +20,7 @@ public class Conta {
         this.nome = nome;
         this.cpf = cpf;
         this.saldoInicial = saldoInicial;
-        this.ativa = 's';
+        this.ativa = 'S';
         this.tipo = tipo;
     }
 
@@ -32,6 +32,10 @@ public class Conta {
         this.dataAbertura = LocalDateTime.now();
     }
 
+    public void setAtiva(char ativa) {
+        this.ativa = ativa;
+    }
+    
     public void validar(){
         if (nome == null || nome.trim().isEmpty()) {
             throw new IllegalArgumentException("Nome do titular é obrigatório.");
