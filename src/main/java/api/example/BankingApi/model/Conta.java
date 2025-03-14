@@ -10,16 +10,16 @@ public class Conta {
     private String nome;
     private String cpf;
     private LocalDateTime dataAbertura;
-    private double saldoInicial;
+    private double saldo;
     private char ativa;
     private Tipos tipo;
 
-    public Conta(Long numero, String agencia, String nome, String cpf, double saldoInicial, Tipos tipo) {
+    public Conta(Long numero, String agencia, String nome, String cpf, double saldo, Tipos tipo) {
         this.numero = numero;
         this.agencia = agencia;
         this.nome = nome;
         this.cpf = cpf;
-        this.saldoInicial = saldoInicial;
+        this.saldo = saldo;
         this.ativa = 'S';
         this.tipo = tipo;
     }
@@ -35,6 +35,10 @@ public class Conta {
     public void setAtiva(char ativa) {
         this.ativa = ativa;
     }
+
+    public void setSaldo(double saldo) {
+        this.saldo = saldo;
+    }
     
     public void validar(){
         if (nome == null || nome.trim().isEmpty()) {
@@ -46,7 +50,7 @@ public class Conta {
         if (dataAbertura != null && dataAbertura.isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("A data de abertura não pode ser no futuro.");
         }
-        if (saldoInicial < 0) {
+        if (saldo < 0) {
             throw new IllegalArgumentException("O saldo inicial não pode ser negativo.");
         }
     }
@@ -76,8 +80,8 @@ public class Conta {
         return cpf;
     }
 
-    public double getSaldoInicial() {
-        return saldoInicial;
+    public double getSaldo() {
+        return saldo;
     }
 
     public char getAtiva() {

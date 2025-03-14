@@ -1,6 +1,8 @@
 package api.example.BankingApi.controller;
 
 import api.example.BankingApi.model.Conta;
+import api.example.BankingApi.model.Deposito;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,8 +65,33 @@ public class ContaController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    // Endpoint para realizar depósitos em uma conta (POST /contas/{id}/depositar)
+    @PostMapping("/contas/{id}/depositar")
+    public ResponseEntity<Conta> realizarDeposito(@PathVariable Long id, @RequestBody Deposito deposito) {
+        double valorDeposito = deposito.getValor(); // Obtém o valor do depósito
+
+        if (valorDeposito <= 0) {
+            return ResponseEntity.badRequest().body(null); // Verifica se o valor do depósito é válido
+        }
+
+        Conta conta = contas.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+
+        if (conta == null) {
+            return ResponseEntity.status(404).body(null);
+        }
+
+        // Atualiza o saldo da conta
+        double novoSaldo = conta.getSaldo() + valorDeposito;
+        conta.setSaldo(novoSaldo);
+
+        return ResponseEntity.ok(conta); // Retorna os dados da conta atualizada
+    }
+
     // Endpoint para encerrar uma conta
-    @PutMapping("/{id}/encerrar")
+    @PutMapping("contas/{id}/encerrar")
     public ResponseEntity<String> encerrarConta(@PathVariable Long id) {
         // Busca a conta pelo ID
         Conta conta = contas.stream()
@@ -77,5 +104,5 @@ public class ContaController {
         // Caso a conta seja encontrada marca a conta como inativa
         conta.setAtiva('N');
         return ResponseEntity.ok("Conta encerrada com sucesso");
-    }
+    }    
 }
